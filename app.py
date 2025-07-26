@@ -1,9 +1,12 @@
 import streamlit as st
+import PyPDF2
+import pandas as pd
+from PIL import Image
 
 # Set page configuration
 st.set_page_config(page_title="MedAce", layout="wide")
 
-# Title and intro
+# Title and introdo
 st.title("🩺 MedAce - Smart Medical Report Analyzer")
 st.write("Welcome! Upload your Medical Report to begin.")
 
@@ -41,3 +44,36 @@ with right_col:
     
     else:
         st.info("Analysis and visualizations will appear here once a file is uploaded.")
+
+
+if uploaded_file and uploaded_file.type == "application/pdf":
+    reader = PyPDF2.PdfReader(uploaded_file)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text()
+    
+    with st.expander("📄 Extracted Text from PDF"):
+        st.write(text if text else "No readable text found.")
+
+
+if uploaded_file and uploaded_file.type == "text/csv":
+    df = pd.read_csv(uploaded_file)
+    
+    st.markdown("### 📊 Report Table:")
+    st.dataframe(df)
+
+if uploaded_file and uploaded_file.type == "text/plain":
+    content = uploaded_file.read().decode("utf-8")
+    
+    st.markdown("### 🧾 Text File Content:")
+    st.text_area("Report Content", content, height=300)
+
+
+if uploaded_file and uploaded_file.type.startswith("image"):
+    image = Image.open(uploaded_file)
+    
+    st.markdown("### 🖼️ Uploaded Image:")
+    st.image(image, caption=uploaded_file.name, use_column_width=True)
+
+else:
+    st.error("Unsupported file type or failed to read file.")
