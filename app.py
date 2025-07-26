@@ -43,7 +43,7 @@ with right_col:
         st.markdown("Trends Over Time:")
         st.info("Once you upload more reports, we'll show your health trends here.")
 
-        # 📥 Download Button
+        # Download Button
         st.markdown("Download Your Summary:")
         dummy_report = """
         MedAce - Health Report Summary
@@ -56,7 +56,7 @@ with right_col:
         """
         buffer = io.StringIO(dummy_report)
         st.download_button(
-            label="📄 Download Summary as .txt",
+            label="Download Summary as .txt",
             data=buffer.getvalue(),
             file_name="medace_summary.txt",
             mime="text/plain"
@@ -84,12 +84,12 @@ if uploaded_file:
     elif file_name.endswith(".csv"):
         try:
             df = pd.read_csv(uploaded_file)
-            st.markdown("### 🧾 Report Table:")
+            st.markdown("Report Table:")
             st.dataframe(df)
 
             if "age" in df.columns and "chol" in df.columns:
                 # Scatter Plot
-                st.markdown("### 📊 Cholesterol vs Age")
+                st.markdown("Cholesterol vs Age")
                 fig1, ax1 = plt.subplots()
                 sns.scatterplot(data=df, x="age", y="chol", hue="sex", palette="Set2", ax=ax1)
                 ax1.set_title("Cholesterol Levels by Age")
@@ -98,7 +98,7 @@ if uploaded_file:
                 st.pyplot(fig1)
 
                 # Histogram
-                st.markdown("### 📈 Cholesterol Distribution")
+                st.markdown("Cholesterol Distribution")
                 fig2, ax2 = plt.subplots()
                 sns.histplot(data=df, x="chol", bins=30, kde=True, color='skyblue', ax=ax2)
                 ax2.axvline(240, color='red', linestyle='--', label='High Cholesterol (240 mg/dL)')
@@ -112,16 +112,32 @@ if uploaded_file:
         except Exception as e:
             st.error(f"Error reading CSV file: {e}")
 
+        # Cholesterol Bar Chart by Gender
+        st.markdown("Average Cholesterol by Gender")
+
+        gender_map = {0: 'Female', 1: 'Male'}
+        df['gender_label'] = df['sex'].map(gender_map)
+
+        avg_chol = df.groupby("gender_label")["chol"].mean().reset_index()
+
+        fig3, ax3 = plt.subplots()
+        sns.barplot(data=avg_chol, x="gender_label", y="chol", palette="coolwarm", ax=ax3)
+        ax3.set_title("Average Cholesterol Levels by Gender")
+        ax3.set_xlabel("Gender")
+        ax3.set_ylabel("Average Cholesterol (mg/dL)")
+        st.pyplot(fig3)
+              
+
     # Text files
     elif file_name.endswith(".txt"):
         content = uploaded_file.read().decode("utf-8")
-        st.markdown("### 📝 Text File Content:")
+        st.markdown("Text File Content:")
         st.text_area("Report Content", content, height=300)
 
     # Image files
     elif file_name.endswith((".png", ".jpg", ".jpeg")):
         image = Image.open(uploaded_file)
-        st.markdown("### 🖼️ Uploaded Image:")
+        st.markdown("Uploaded Image:")
         st.image(image, caption=uploaded_file.name, use_column_width=True)
 
     else:
