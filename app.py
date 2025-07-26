@@ -67,10 +67,13 @@ if uploaded_file:
     file_type = uploaded_file.type
 
     if file_type == "application/pdf":
-        reader = PyPDF2.PdfReader(uploaded_file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
+        with st.spinner("Extracting text from PDF..."):
+            reader = PyPDF2.PdfReader(uploaded_file)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text()
+            st.success("Extraction complete!")
+
         with st.expander("Extracted Text from PDF"):
             st.write(text if text else "No readable text found.")
 
@@ -100,6 +103,7 @@ with st.sidebar:
     st.button("Chat with MedAce (coming soon)")
     st.button("My Report History (coming soon)")
     st.divider()
-    st.markdown("Need help? [Contact us](mailto: coming soon)")
+    st.markdown("Need help? [Contact us](mailto:support@medace.ai)")  # <- email updated!
+
 
     
