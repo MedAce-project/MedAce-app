@@ -3,6 +3,8 @@ import PyPDF2
 import pandas as pd
 from PIL import Image
 import io
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Page settings
 st.set_page_config(page_title="MedAce", layout="wide")
@@ -81,6 +83,26 @@ if uploaded_file:
         df = pd.read_csv(uploaded_file)
         st.markdown("Report Table:")
         st.dataframe(df)
+
+        #Dummy scatter plot and histogram for cholesterol vs Age( only for CSV for now)
+        st.markdown("Cholesterol vs Age")
+        fig1,ax1 = plt.subplots()
+        sns.scatterplot(data=df, x ="age",y= "chol", hue="sex", palette="Set2", ax=ax1)
+        ax1.set_title("Cholesterol Levels by Age")
+        ax1.set_xlabel("Age")
+        ax1.set_ylabel("Cholesterol(mg/dL)")
+        st.pyplot(fig1)
+
+        #Cholesterol vs Age Histogram
+        st.markdown("Cholesterol Distribution")
+        fid2, ax2 = plt.subplots()
+        sns.histplot(data=df, x="chol", bins=30, kde=True, color='skyblue', ax=ax2)
+        ax2.axvline(240,color='red', linestyle='--',label='High Cholesterol(240 mg/dL)')
+        ax2.set_title("Cholesterol Distribution in Patients")
+        ax2.set_xlabel("Cholesterol (mg/dL)")
+        ax2.set_ylabel("Number of Patients")
+        ax2.legend()
+        st.pyplot(fig2)
 
     elif file_type == "text/plain":
         content = uploaded_file.read().decode("utf-8")
