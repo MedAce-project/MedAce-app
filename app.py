@@ -66,9 +66,10 @@ with right_col:
 
 # ---- File-Specific Display ----
 if uploaded_file:
-    file_type = uploaded_file.type
+    file_name = uploaded_file.name.lower()
 
-    if file_type == "application/pdf":
+    # PDF files
+    if file_name.endswith(".pdf"):
         with st.spinner("Extracting text from PDF..."):
             reader = PyPDF2.PdfReader(uploaded_file)
             text = ""
@@ -79,39 +80,48 @@ if uploaded_file:
         with st.expander("Extracted Text from PDF"):
             st.write(text if text else "No readable text found.")
 
-    elif file_type == "text/csv":
-        df = pd.read_csv(uploaded_file)
-        st.markdown("Report Table:")
-        st.dataframe(df)
+    # CSV files
+    elif file_name.endswith(".csv"):
+        try:
+            df = pd.read_csv(uploaded_file)
+            st.markdown("### 🧾 Report Table:")
+            st.dataframe(df)
 
-        #Dummy scatter plot and histogram for cholesterol vs Age( only for CSV for now)
-        st.markdown("Cholesterol vs Age")
-        fig1,ax1 = plt.subplots()
-        sns.scatterplot(data=df, x ="age",y= "chol", hue="sex", palette="Set2", ax=ax1)
-        ax1.set_title("Cholesterol Levels by Age")
-        ax1.set_xlabel("Age")
-        ax1.set_ylabel("Cholesterol(mg/dL)")
-        st.pyplot(fig1)
+            if "age" in df.columns and "chol" in df.columns:
+                # Scatter Plot
+                st.markdown("### 📊 Cholesterol vs Age")
+                fig1, ax1 = plt.subplots()
+                sns.scatterplot(data=df, x="age", y="chol", hue="sex", palette="Set2", ax=ax1)
+                ax1.set_title("Cholesterol Levels by Age")
+                ax1.set_xlabel("Age")
+                ax1.set_ylabel("Cholesterol (mg/dL)")
+                st.pyplot(fig1)
 
-        #Cholesterol vs Age Histogram
-        st.markdown("Cholesterol Distribution")
-        fid2, ax2 = plt.subplots()
-        sns.histplot(data=df, x="chol", bins=30, kde=True, color='skyblue', ax=ax2)
-        ax2.axvline(240,color='red', linestyle='--',label='High Cholesterol(240 mg/dL)')
-        ax2.set_title("Cholesterol Distribution in Patients")
-        ax2.set_xlabel("Cholesterol (mg/dL)")
-        ax2.set_ylabel("Number of Patients")
-        ax2.legend()
-        st.pyplot(fig2)
+                # Histogram
+                st.markdown("### 📈 Cholesterol Distribution")
+                fig2, ax2 = plt.subplots()
+                sns.histplot(data=df, x="chol", bins=30, kde=True, color='skyblue', ax=ax2)
+                ax2.axvline(240, color='red', linestyle='--', label='High Cholesterol (240 mg/dL)')
+                ax2.set_title("Cholesterol Distribution in Patients")
+                ax2.set_xlabel("Cholesterol (mg/dL)")
+                ax2.set_ylabel("Number of Patients")
+                ax2.legend()
+                st.pyplot(fig2)
+            else:
+                st.warning("CSV does not contain expected columns like 'age' and 'chol'.")
+        except Exception as e:
+            st.error(f"Error reading CSV file: {e}")
 
-    elif file_type == "text/plain":
+    # Text files
+    elif file_name.endswith(".txt"):
         content = uploaded_file.read().decode("utf-8")
-        st.markdown("Text File Content:")
+        st.markdown("### 📝 Text File Content:")
         st.text_area("Report Content", content, height=300)
 
-    elif file_type.startswith("image"):
+    # Image files
+    elif file_name.endswith((".png", ".jpg", ".jpeg")):
         image = Image.open(uploaded_file)
-        st.markdown("Uploaded Image:")
+        st.markdown("### 🖼️ Uploaded Image:")
         st.image(image, caption=uploaded_file.name, use_column_width=True)
 
     else:
@@ -125,7 +135,7 @@ with st.sidebar:
     st.button("Chat with MedAce (coming soon)")
     st.button("My Report History (coming soon)")
     st.divider()
-    st.markdown("Need help? [Contact us](mailto:support@medace.ai)")  # <- email updated!
+    st.markdown("Need help? [Contact us](mailto:support@medace.ai)")
 
 
     
