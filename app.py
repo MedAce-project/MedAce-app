@@ -14,35 +14,35 @@ left_col, right_col = st.columns([1, 2])
 
 # ---- LEFT COLUMN: Upload ----
 with left_col:
-    st.header("📄 Upload Report")
+    st.header("Upload Report")
     uploaded_file = st.file_uploader(
         "Choose a Medical Report",
         type=["pdf", "csv", "png", "jpg", "jpeg", "txt"],
         help="Upload your medical report here (PDF, Image, or Text). Max Size: 10MB"
     )
     if uploaded_file:
-        st.success("✅ File Uploaded Successfully.")
+        st.success("File Uploaded Successfully.")
         st.markdown(f"**Filename:** `{uploaded_file.name}`")
 
 # ---- RIGHT COLUMN: Analysis ----
 with right_col:
-    st.header("🧾 Report Summary")
+    st.header("Report Summary")
 
     if uploaded_file:
-        st.markdown("### 🩺 Extracted Report Details:")
+        st.markdown("Extracted Report Details:")
         st.write("Sample content: Hemoglobin 11.2, WBC 8000, Platelets 2.3 lakh...")
 
-        st.markdown("### 📊 Summary:")
+        st.markdown("Summary:")
         st.success("Overall, your results look normal. Slight anemia detected.")
 
-        st.markdown("### ⚠️ Health Alerts:")
+        st.markdown("Health Alerts:")
         st.warning("Hemoglobin is slightly below the normal range.")
 
-        st.markdown("### 📈 Trends Over Time:")
+        st.markdown("Trends Over Time:")
         st.info("Once you upload more reports, we'll show your health trends here.")
 
         # 📥 Download Button
-        st.markdown("### 📥 Download Your Summary:")
+        st.markdown("Download Your Summary:")
         dummy_report = """
         MedAce - Health Report Summary
         ------------------------------
@@ -71,22 +71,22 @@ if uploaded_file:
         text = ""
         for page in reader.pages:
             text += page.extract_text()
-        with st.expander("📄 Extracted Text from PDF"):
+        with st.expander("Extracted Text from PDF"):
             st.write(text if text else "No readable text found.")
 
     elif file_type == "text/csv":
         df = pd.read_csv(uploaded_file)
-        st.markdown("### 📊 Report Table:")
+        st.markdown("Report Table:")
         st.dataframe(df)
 
     elif file_type == "text/plain":
         content = uploaded_file.read().decode("utf-8")
-        st.markdown("### 🧾 Text File Content:")
+        st.markdown("Text File Content:")
         st.text_area("Report Content", content, height=300)
 
     elif file_type.startswith("image"):
         image = Image.open(uploaded_file)
-        st.markdown("### 🖼️ Uploaded Image:")
+        st.markdown("Uploaded Image:")
         st.image(image, caption=uploaded_file.name, use_column_width=True)
 
     else:
@@ -96,10 +96,10 @@ if uploaded_file:
 with st.sidebar:
     st.title("MedAce")
     st.markdown("Navigation")
-    st.page_link("https://medace-app-intrtjskaqsuzyedtqrcfh.streamlit.app/", label="🏠 Home", icon="🏠")
+    st.page_link("https://medace-app-intrtjskaqsuzyedtqrcfh.streamlit.app/", label="Home", icon="🏠")
     st.button("Chat with MedAce (coming soon)")
     st.button("My Report History (coming soon)")
     st.divider()
-    st.markdown("Need help? [Contact us](mailto:support@medace.ai)")
+    st.markdown("Need help? [Contact us](mailto: coming soon)")
 
     
