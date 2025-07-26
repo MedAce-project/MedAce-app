@@ -4,17 +4,15 @@ import pandas as pd
 from PIL import Image
 import io
 
-# Set page configuration
+# Page settings
 st.set_page_config(page_title="MedAce", layout="wide")
-
-# Title and introdo
 st.title("🩺 MedAce - Smart Medical Report Analyzer")
 st.write("Welcome! Upload your Medical Report to begin.")
 
-# Create two columns
+# Two columns
 left_col, right_col = st.columns([1, 2])
 
-# Left Column: File Upload
+# ---- LEFT COLUMN: Upload ----
 with left_col:
     st.header("📄 Upload Report")
     uploaded_file = st.file_uploader(
@@ -26,32 +24,10 @@ with left_col:
         st.success("✅ File Uploaded Successfully.")
         st.markdown(f"**Filename:** `{uploaded_file.name}`")
 
-# Right Column: Display Report Analysis
+# ---- RIGHT COLUMN: Analysis ----
 with right_col:
     st.header("🧾 Report Summary")
 
-
-# Dummy downloadable text
-if uploaded_file:
-    st.markdown("### 📥 Download Your Summary:")
-    dummy_report = """
-    MedAce - Health Report Summary
-    ------------------------------
-    ✅ Hemoglobin: 11.2 g/dL (Slightly low)
-    ✅ WBC: 8000 /µL (Normal)
-    ✅ Platelets: 2.3 lakh /µL (Normal)
-
-    ⚠️ Note: Slight anemia detected.
-    """
-    buffer = io.StringIO(dummy_report)
-
-    st.download_button(
-        label="📄 Download Summary as .txt",
-        data=buffer.getvalue(),
-        file_name="medace_summary.txt",
-        mime="text/plain"
-    )
-    
     if uploaded_file:
         st.markdown("### 🩺 Extracted Report Details:")
         st.write("Sample content: Hemoglobin 11.2, WBC 8000, Platelets 2.3 lakh...")
@@ -64,51 +40,66 @@ if uploaded_file:
 
         st.markdown("### 📈 Trends Over Time:")
         st.info("Once you upload more reports, we'll show your health trends here.")
-    
+
+        # 📥 Download Button
+        st.markdown("### 📥 Download Your Summary:")
+        dummy_report = """
+        MedAce - Health Report Summary
+        ------------------------------
+        ✅ Hemoglobin: 11.2 g/dL (Slightly low)
+        ✅ WBC: 8000 /µL (Normal)
+        ✅ Platelets: 2.3 lakh /µL (Normal)
+
+        ⚠️ Note: Slight anemia detected.
+        """
+        buffer = io.StringIO(dummy_report)
+        st.download_button(
+            label="📄 Download Summary as .txt",
+            data=buffer.getvalue(),
+            file_name="medace_summary.txt",
+            mime="text/plain"
+        )
     else:
         st.info("Analysis and visualizations will appear here once a file is uploaded.")
 
+# ---- File-Specific Display ----
+if uploaded_file:
+    file_type = uploaded_file.type
 
-if uploaded_file and uploaded_file.type == "application/pdf":
-    reader = PyPDF2.PdfReader(uploaded_file)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text()
-    
-    with st.expander("📄 Extracted Text from PDF"):
-        st.write(text if text else "No readable text found.")
+    if file_type == "application/pdf":
+        reader = PyPDF2.PdfReader(uploaded_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text()
+        with st.expander("📄 Extracted Text from PDF"):
+            st.write(text if text else "No readable text found.")
 
+    elif file_type == "text/csv":
+        df = pd.read_csv(uploaded_file)
+        st.markdown("### 📊 Report Table:")
+        st.dataframe(df)
 
-if uploaded_file and uploaded_file.type == "text/csv":
-    df = pd.read_csv(uploaded_file)
-    
-    st.markdown("### 📊 Report Table:")
-    st.dataframe(df)
+    elif file_type == "text/plain":
+        content = uploaded_file.read().decode("utf-8")
+        st.markdown("### 🧾 Text File Content:")
+        st.text_area("Report Content", content, height=300)
 
-if uploaded_file and uploaded_file.type == "text/plain":
-    content = uploaded_file.read().decode("utf-8")
-    
-    st.markdown("### 🧾 Text File Content:")
-    st.text_area("Report Content", content, height=300)
+    elif file_type.startswith("image"):
+        image = Image.open(uploaded_file)
+        st.markdown("### 🖼️ Uploaded Image:")
+        st.image(image, caption=uploaded_file.name, use_column_width=True)
 
+    else:
+        st.warning("File uploaded, but could not read its content.")
 
-if uploaded_file and uploaded_file.type.startswith("image"):
-    image = Image.open(uploaded_file)
-    
-    st.markdown("### 🖼️ Uploaded Image:")
-    st.image(image, caption=uploaded_file.name, use_column_width=True)
-
-else:
-    st.error("Unsupported file type or failed to read file.")
-
-
+# ---- Sidebar ----
 with st.sidebar:
     st.title("MedAce")
     st.markdown("Navigation")
-    st.page_link("https://medace-app-intrtjskaqsuzyedtqrcfh.streamlit.app/",label="🏠Home",icon="🏠")
-    st.button("Chat with MedAce(coming soon)")
-    st.button("My Report History(coming soon)")
+    st.page_link("https://medace-app-intrtjskaqsuzyedtqrcfh.streamlit.app/", label="🏠 Home", icon="🏠")
+    st.button("Chat with MedAce (coming soon)")
+    st.button("My Report History (coming soon)")
     st.divider()
-    st.markdown("Need help?[Contact us](mailto: coming soon.)")
+    st.markdown("Need help? [Contact us](mailto:support@medace.ai)")
 
     
