@@ -2,6 +2,7 @@ import streamlit as st
 import PyPDF2
 import pandas as pd
 from PIL import Image
+import io
 
 # Set page configuration
 st.set_page_config(page_title="MedAce", layout="wide")
@@ -28,6 +29,28 @@ with left_col:
 # Right Column: Display Report Analysis
 with right_col:
     st.header("🧾 Report Summary")
+
+
+# Dummy downloadable text
+if uploaded_file:
+    st.markdown("### 📥 Download Your Summary:")
+    dummy_report = """
+    MedAce - Health Report Summary
+    ------------------------------
+    ✅ Hemoglobin: 11.2 g/dL (Slightly low)
+    ✅ WBC: 8000 /µL (Normal)
+    ✅ Platelets: 2.3 lakh /µL (Normal)
+
+    ⚠️ Note: Slight anemia detected.
+    """
+    buffer = io.StringIO(dummy_report)
+
+    st.download_button(
+        label="📄 Download Summary as .txt",
+        data=buffer.getvalue(),
+        file_name="medace_summary.txt",
+        mime="text/plain"
+    )
     
     if uploaded_file:
         st.markdown("### 🩺 Extracted Report Details:")
@@ -87,3 +110,5 @@ with st.sidebar:
     st.button("My Report History(coming soon)")
     st.divider()
     st.markdown("Need help?[Contact us](mailto: coming soon.)")
+
+    
