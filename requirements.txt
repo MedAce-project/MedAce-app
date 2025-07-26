@@ -5,3 +5,4 @@ pandas
 numpy
 openai
 matplotlib
+seaborn
