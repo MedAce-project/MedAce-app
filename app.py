@@ -77,3 +77,13 @@ if uploaded_file and uploaded_file.type.startswith("image"):
 
 else:
     st.error("Unsupported file type or failed to read file.")
+
+
+with st.sidebar:
+    st.title("MedAce")
+    st.markdown("Navigation")
+    st.page_link("https://medace-app-intrtjskaqsuzyedtqrcfh.streamlit.app/",label="🏠Home",icon="🏠")
+    st.button("Chat with MedAce(coming soon)")
+    st.button("My Report History(coming soon)")
+    st.divider()
+    st.markdown("Need help?[Contact us](mailto: coming soon.)")
